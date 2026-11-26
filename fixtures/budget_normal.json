@@ -1,0 +1,93 @@
+[
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p1",
+      "op": "source-register",
+      "id": "src",
+      "pod": "pod-a",
+      "uid": "uid-1",
+      "epoch": 1
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p2",
+      "op": "sample-record",
+      "id": "s1",
+      "source": "src",
+      "epoch": 1,
+      "seq": 1,
+      "healthy": false,
+      "at": 10
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p3",
+      "op": "sample-record",
+      "id": "s2",
+      "source": "src",
+      "epoch": 1,
+      "seq": 2,
+      "healthy": false,
+      "at": 11
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p4",
+      "op": "window-evaluate",
+      "source": "src"
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b1",
+      "op": "policy",
+      "service": "svc-a",
+      "min_available": 1,
+      "capacity": 2,
+      "cooldown": 10
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b1a",
+      "op": "member",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "uid": "uid-1",
+      "state": "active"
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b1b",
+      "op": "member",
+      "service": "svc-a",
+      "pod": "pod-b",
+      "uid": "uid-b",
+      "state": "active"
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b2",
+      "op": "credit-reserve",
+      "id": "r1",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "uid": "uid-1",
+      "available": 2,
+      "at": 12
+    }
+  }
+]
