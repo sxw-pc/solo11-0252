@@ -1,4 +1,5 @@
 from .store import one
+from . import volumes
 SCHEMA='''
 CREATE TABLE IF NOT EXISTS drain_cases(id TEXT PRIMARY KEY,pod TEXT,uid TEXT,restart_id TEXT,status TEXT);
 CREATE TABLE IF NOT EXISTS session_receipts(id TEXT PRIMARY KEY,case_id TEXT,session TEXT,uid TEXT,status TEXT);
@@ -28,6 +29,8 @@ def handle(db,x):
         w=one(db,'SELECT * FROM health_windows WHERE pod=?',(case['pod'],)) if case else None
         if not case or case['status']!='drained' or not d or d['status']!='settled' or not w or w['uid']!=x['new_uid'] or w['status']!='healthy':
             return {'decision':'traffic_still_withdrawn'}
+        if not volumes.ready(db, d['service'], case['pod'], x['new_uid'], case['id']):
+            return {'decision':'volumes_not_verified'}
         db.execute('INSERT INTO traffic_decisions VALUES(?,?,?,?,?)',(x['id'],case['pod'],x['new_uid'],'restored',x['at']))
         db.execute("UPDATE drain_cases SET status='complete' WHERE id=?",(x['case'],))
         db.execute("UPDATE service_members SET state='active' WHERE service=? AND pod=? AND uid=?",(d['service'],case['pod'],x['new_uid']))

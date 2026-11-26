@@ -52,3 +52,9 @@ python -m unittest discover -s tests -v
 - **探针证据庭 → 会话撤流庭**：探针误判复核把 pod-a 从确认失败改为证据冲突，撤流庭取消未执行的排空并保留已发重启决定的审计债务。失败分支：若重启已结算，迟到误判纠正不能把已发生的容器代际改回旧实例
 
 该仓仅实现本地业务状态与回执协议；不连接真实 Kubernetes、设备插件、时间服务或告警平台。
+
+### 挂载卷验收
+
+对于磁盘恢复后才能开放流量的实例，通过 `volumes` 命令登记 `requirements-register` 卷清单与原容器 `snapshot-record`。替代容器启动后用 `snapshot-verify` 提交每个实际挂载卷的摘要；校验绑定撤流单、旧快照代际、现役替代代际及卷名。已登记的卷全部核对后才允许复流。未登记卷清单的旧流程仍直接复流。
+
+运行 `python -B -m probecourt volumes --db volumes.sqlite --fixture fixtures/volumes_normal.json`，再执行 `python -B -m probecourt replay --db volumes.sqlite`。
