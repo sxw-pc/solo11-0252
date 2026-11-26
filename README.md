@@ -52,3 +52,10 @@ python -m unittest discover -s tests -v
 - **探针证据庭 → 会话撤流庭**：探针误判复核把 pod-a 从确认失败改为证据冲突，撤流庭取消未执行的排空并保留已发重启决定的审计债务。失败分支：若重启已结算，迟到误判纠正不能把已发生的容器代际改回旧实例
 
 该仓仅实现本地业务状态与回执协议；不连接真实 Kubernetes、设备插件、时间服务或告警平台。
+
+
+### 会话交接
+
+撤流单有尚未关闭的会话时，可用 traffic 的 handoff-manifest 安排整单接收端。输入包含 case、原容器 uid、按名称索引的 gateways（各有 uid 与 capacity）和按会话索引的 assignments（各有 gateway 与 units）。接单后不可用口头 session-ack 清除待办。使用 session-adopt 录入同一 case、uid、session、manifest（安排事件编号）、gateway、gateway_uid 与 receipt。最后一个有效接单回执到达后撤流单为 drained，可经原 restart-settle 结算。没有接单安排的撤流单仍能用 session-ack 关闭会话。该入口按接收端正常联机的容量核对排布。
+
+示例：`python -B -m probecourt traffic --db handoff.sqlite --fixture fixtures/handoff_normal.json`，再用 `python -B -m probecourt replay --db handoff.sqlite` 复核。
