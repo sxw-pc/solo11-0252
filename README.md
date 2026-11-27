@@ -58,3 +58,13 @@ python -m unittest discover -s tests -v
 对于磁盘恢复后才能开放流量的实例，通过 `volumes` 命令登记 `requirements-register` 卷清单与原容器 `snapshot-record`。替代容器启动后用 `snapshot-verify` 提交每个实际挂载卷的摘要；校验绑定撤流单、旧快照代际、现役替代代际及卷名。已登记的卷全部核对后才允许复流。未登记卷清单的旧流程仍直接复流。
 
 运行 `python -B -m probecourt volumes --db volumes.sqlite --fixture fixtures/volumes_normal.json`，再执行 `python -B -m probecourt replay --db volumes.sqlite`。
+
+### 跨卷事务恢复单
+
+逐卷摘要各自为真并不代表业务写入完整：备用快照保留时间不齐时，各卷最新快照拼出的事务集合可能互相残缺。登记 `manifest-record` 跨卷事务清单后（每笔业务写入的事务号、参与卷、是否已签完成回执），验收升级为恢复单模式：
+
+- `snapshot-record` 在每份真实快照上签认它包含的完整本地事务号集合；一次验收限同一原 UID、替代 UID、撤流单，最多四卷、每卷最多四份可挂快照，`snapshot-withdraw` 登记保留到期删除。
+- `plan-propose` 为每个登记卷选定一份真实快照生成恢复单：每笔事务必须在全部参与卷同现或同现缺；已签完成回执的事务必须全体保留；若另一组可行真实快照能保留当前全部暂存事务且至少多一笔，当前方案不得签发。签发结果给出实际保留的事务集合。
+- 复流须在 `traffic-restore` 引用已批准恢复单；`snapshot-verify` 逐卷实读摘要必须绑定恢复单实际选定的同一快照、当前替代 UID 与该案，摘要或 checkpoint 相同也不能以另一分支的卷代替，所有选定卷验证前不放行。
+
+运行 `python -B -m probecourt volumes --db volumes.sqlite --fixture fixtures/volumes_plan.json`（8/13/7 恢复 P 与暂存事务 X）与 `fixtures/volumes_withdrawn.json`（含 P 快照被删后无可签方案、不放行），再执行 `python -B -m probecourt replay --db volumes.sqlite`。无事务清单的旧格式快照仍按原行为验收复流。

@@ -1,0 +1,571 @@
+[
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p1",
+      "op": "source-register",
+      "id": "src",
+      "pod": "pod-a",
+      "uid": "uid-1",
+      "epoch": 1
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p2",
+      "op": "sample-record",
+      "id": "s1",
+      "source": "src",
+      "epoch": 1,
+      "seq": 1,
+      "healthy": false,
+      "at": 10
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p3",
+      "op": "sample-record",
+      "id": "s2",
+      "source": "src",
+      "epoch": 1,
+      "seq": 2,
+      "healthy": false,
+      "at": 11
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p4",
+      "op": "window-evaluate",
+      "source": "src"
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b1",
+      "op": "policy",
+      "service": "svc-a",
+      "min_available": 1,
+      "capacity": 2,
+      "cooldown": 10
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b1a",
+      "op": "member",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "uid": "uid-1",
+      "state": "active"
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b1b",
+      "op": "member",
+      "service": "svc-a",
+      "pod": "pod-b",
+      "uid": "uid-b",
+      "state": "active"
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b2",
+      "op": "credit-reserve",
+      "id": "r1",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "uid": "uid-1",
+      "available": 2,
+      "at": 12
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "t1",
+      "op": "session-drain",
+      "id": "d1",
+      "restart": "r1",
+      "uid": "uid-1",
+      "sessions": [
+        "session-a",
+        "session-b"
+      ]
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "t2",
+      "op": "session-ack",
+      "case": "d1",
+      "uid": "uid-1",
+      "session": "session-a"
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "t3",
+      "op": "traffic-restore",
+      "id": "tr1",
+      "case": "d1",
+      "new_uid": "uid-2",
+      "at": 13
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "t4",
+      "op": "session-ack",
+      "case": "d1",
+      "uid": "uid-1",
+      "session": "session-b"
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b3",
+      "op": "restart-settle",
+      "id": "r1",
+      "old_uid": "uid-1",
+      "new_uid": "uid-2",
+      "receipt": "runtime-uid2"
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p5",
+      "op": "source-register",
+      "id": "src",
+      "pod": "pod-a",
+      "uid": "uid-2",
+      "epoch": 2
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p6",
+      "op": "sample-record",
+      "id": "s3",
+      "source": "src",
+      "epoch": 2,
+      "seq": 1,
+      "healthy": true,
+      "at": 14
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p7",
+      "op": "sample-record",
+      "id": "s4",
+      "source": "src",
+      "epoch": 2,
+      "seq": 2,
+      "healthy": true,
+      "at": 15
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p8",
+      "op": "window-evaluate",
+      "source": "src"
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "requirements-register",
+      "event_id": "rv",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "volumes": [
+        "data",
+        "ledger",
+        "index"
+      ]
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "manifest-record",
+      "event_id": "manifest",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "transactions": [
+        {
+          "id": "P",
+          "volumes": [
+            "data",
+            "ledger",
+            "index"
+          ],
+          "acked": true
+        },
+        {
+          "id": "X",
+          "volumes": [
+            "data",
+            "ledger",
+            "index"
+          ],
+          "acked": false
+        },
+        {
+          "id": "Y",
+          "volumes": [
+            "data",
+            "ledger",
+            "index"
+          ],
+          "acked": false
+        }
+      ]
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-record",
+      "event_id": "record-snap-data-0",
+      "id": "snap-data-0",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "volume": "data",
+      "source_uid": "uid-1",
+      "checkpoint": 0,
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "transactions": [
+        "P"
+      ]
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-record",
+      "event_id": "record-snap-data-8",
+      "id": "snap-data-8",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "volume": "data",
+      "source_uid": "uid-1",
+      "checkpoint": 8,
+      "digest": "8888888888888888888888888888888888888888888888888888888888888888",
+      "transactions": [
+        "P",
+        "X"
+      ]
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-record",
+      "event_id": "record-snap-data-12",
+      "id": "snap-data-12",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "volume": "data",
+      "source_uid": "uid-1",
+      "checkpoint": 12,
+      "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "transactions": [
+        "P",
+        "Y"
+      ]
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-record",
+      "event_id": "record-snap-ledger-0",
+      "id": "snap-ledger-0",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "volume": "ledger",
+      "source_uid": "uid-1",
+      "checkpoint": 0,
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "transactions": [
+        "P"
+      ]
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-record",
+      "event_id": "record-snap-ledger-9",
+      "id": "snap-ledger-9",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "volume": "ledger",
+      "source_uid": "uid-1",
+      "checkpoint": 9,
+      "digest": "9999999999999999999999999999999999999999999999999999999999999999",
+      "transactions": [
+        "P",
+        "Y"
+      ]
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-record",
+      "event_id": "record-snap-ledger-13",
+      "id": "snap-ledger-13",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "volume": "ledger",
+      "source_uid": "uid-1",
+      "checkpoint": 13,
+      "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "transactions": [
+        "P",
+        "X"
+      ]
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-record",
+      "event_id": "record-snap-index-0",
+      "id": "snap-index-0",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "volume": "index",
+      "source_uid": "uid-1",
+      "checkpoint": 0,
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "transactions": [
+        "P"
+      ]
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-record",
+      "event_id": "record-snap-index-5",
+      "id": "snap-index-5",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "volume": "index",
+      "source_uid": "uid-1",
+      "checkpoint": 5,
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555",
+      "transactions": [
+        "P",
+        "Y"
+      ]
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-record",
+      "event_id": "record-snap-index-7",
+      "id": "snap-index-7",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "volume": "index",
+      "source_uid": "uid-1",
+      "checkpoint": 7,
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555",
+      "transactions": [
+        "P",
+        "X"
+      ]
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "op": "traffic-restore",
+      "event_id": "restore-no-plan",
+      "id": "tr9",
+      "case": "d1",
+      "new_uid": "uid-2",
+      "at": 17
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-verify",
+      "event_id": "verify-before-plan",
+      "volume": "data",
+      "snapshot": "snap-data-8",
+      "case": "d1",
+      "uid": "uid-2",
+      "observed_digest": "8888888888888888888888888888888888888888888888888888888888888888"
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "plan-propose",
+      "event_id": "propose-base",
+      "id": "plan-base",
+      "case": "d1",
+      "uid": "uid-2",
+      "selections": {
+        "data": "snap-data-0",
+        "ledger": "snap-ledger-0",
+        "index": "snap-index-0"
+      }
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "plan-propose",
+      "event_id": "propose-latest",
+      "id": "plan-latest",
+      "case": "d1",
+      "uid": "uid-2",
+      "selections": {
+        "data": "snap-data-12",
+        "ledger": "snap-ledger-13",
+        "index": "snap-index-7"
+      }
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "plan-propose",
+      "event_id": "propose-a",
+      "id": "plan-a",
+      "case": "d1",
+      "uid": "uid-2",
+      "selections": {
+        "data": "snap-data-8",
+        "ledger": "snap-ledger-13",
+        "index": "snap-index-7"
+      }
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "plan-propose",
+      "event_id": "propose-b",
+      "id": "plan-b",
+      "case": "d1",
+      "uid": "uid-2",
+      "selections": {
+        "data": "snap-data-12",
+        "ledger": "snap-ledger-9",
+        "index": "snap-index-5"
+      }
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-verify",
+      "event_id": "verify-index-other-plan",
+      "volume": "index",
+      "snapshot": "snap-index-5",
+      "case": "d1",
+      "uid": "uid-2",
+      "observed_digest": "5555555555555555555555555555555555555555555555555555555555555555"
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-verify",
+      "event_id": "verify-data",
+      "volume": "data",
+      "snapshot": "snap-data-8",
+      "case": "d1",
+      "uid": "uid-2",
+      "observed_digest": "8888888888888888888888888888888888888888888888888888888888888888"
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-verify",
+      "event_id": "verify-ledger",
+      "volume": "ledger",
+      "snapshot": "snap-ledger-13",
+      "case": "d1",
+      "uid": "uid-2",
+      "observed_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    }
+  },
+  {
+    "command": "volumes",
+    "input": {
+      "op": "snapshot-verify",
+      "event_id": "verify-index",
+      "volume": "index",
+      "snapshot": "snap-index-7",
+      "case": "d1",
+      "uid": "uid-2",
+      "observed_digest": "5555555555555555555555555555555555555555555555555555555555555555"
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "op": "traffic-restore",
+      "event_id": "restore-still-no-plan",
+      "id": "tr9",
+      "case": "d1",
+      "new_uid": "uid-2",
+      "at": 18
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "op": "traffic-restore",
+      "event_id": "restore-bogus-plan",
+      "id": "tr9",
+      "case": "d1",
+      "new_uid": "uid-2",
+      "plan": "plan-bogus",
+      "at": 19
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "op": "traffic-restore",
+      "event_id": "restore-final",
+      "id": "tr9",
+      "case": "d1",
+      "new_uid": "uid-2",
+      "plan": "plan-a",
+      "at": 20
+    }
+  }
+]
