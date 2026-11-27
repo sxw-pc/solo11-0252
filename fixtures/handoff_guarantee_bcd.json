@@ -1,0 +1,217 @@
+[
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p1",
+      "op": "source-register",
+      "id": "src",
+      "pod": "pod-a",
+      "uid": "uid-1",
+      "epoch": 1
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p2",
+      "op": "sample-record",
+      "id": "s1",
+      "source": "src",
+      "epoch": 1,
+      "seq": 1,
+      "healthy": false,
+      "at": 10
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p3",
+      "op": "sample-record",
+      "id": "s2",
+      "source": "src",
+      "epoch": 1,
+      "seq": 2,
+      "healthy": false,
+      "at": 11
+    }
+  },
+  {
+    "command": "probe",
+    "input": {
+      "event_id": "p4",
+      "op": "window-evaluate",
+      "source": "src"
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b1",
+      "op": "policy",
+      "service": "svc-a",
+      "min_available": 1,
+      "capacity": 2,
+      "cooldown": 10
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b1a",
+      "op": "member",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "uid": "uid-1",
+      "state": "active"
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b1b",
+      "op": "member",
+      "service": "svc-a",
+      "pod": "pod-b",
+      "uid": "uid-b",
+      "state": "active"
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "b2",
+      "op": "credit-reserve",
+      "id": "r1",
+      "service": "svc-a",
+      "pod": "pod-a",
+      "uid": "uid-1",
+      "available": 2,
+      "at": 12
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "t1",
+      "op": "session-drain",
+      "id": "d1",
+      "restart": "r1",
+      "uid": "uid-1",
+      "sessions": ["s1", "s2", "s3"]
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "g1-plan1",
+      "op": "handoff-manifest",
+      "case": "d1",
+      "uid": "uid-1",
+      "gateways": {
+        "A": {"uid": "A1", "capacity": 3},
+        "B": {"uid": "B1", "capacity": 3},
+        "C": {"uid": "C1", "capacity": 2},
+        "D": {"uid": "D1", "capacity": 2}
+      },
+      "sessions": {"s1": 1, "s2": 2, "s3": 2},
+      "eligible": {"s1": ["A", "B"], "s2": ["A", "C"], "s3": ["B", "D"]},
+      "plan": {
+        "s1": {"primary": "A", "backup": "B"},
+        "s2": {"primary": "C", "backup": "A"},
+        "s3": {"primary": "D", "backup": "B"}
+      }
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "g1-offline-a",
+      "op": "gateway-offline",
+      "case": "d1",
+      "uid": "uid-1",
+      "gateway": "A"
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "g1-stale-a",
+      "op": "session-adopt",
+      "case": "d1",
+      "uid": "uid-1",
+      "session": "s1",
+      "manifest": "g1-plan1",
+      "gateway": "A",
+      "gateway_uid": "A1",
+      "receipt": "lost-A-receipt"
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "g1-wrong-plan-s3",
+      "op": "session-adopt",
+      "case": "d1",
+      "uid": "uid-1",
+      "session": "s3",
+      "manifest": "g1-plan1",
+      "gateway": "B",
+      "gateway_uid": "B1",
+      "receipt": "borrowed-plan2-receipt"
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "g1-adopt-s1",
+      "op": "session-adopt",
+      "case": "d1",
+      "uid": "uid-1",
+      "session": "s1",
+      "manifest": "g1-plan1",
+      "gateway": "B",
+      "gateway_uid": "B1",
+      "receipt": "g1-s1-bcd"
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "g1-adopt-s2",
+      "op": "session-adopt",
+      "case": "d1",
+      "uid": "uid-1",
+      "session": "s2",
+      "manifest": "g1-plan1",
+      "gateway": "C",
+      "gateway_uid": "C1",
+      "receipt": "g1-s2-bcd"
+    }
+  },
+  {
+    "command": "traffic",
+    "input": {
+      "event_id": "g1-adopt-s3",
+      "op": "session-adopt",
+      "case": "d1",
+      "uid": "uid-1",
+      "session": "s3",
+      "manifest": "g1-plan1",
+      "gateway": "D",
+      "gateway_uid": "D1",
+      "receipt": "g1-s3-bcd"
+    }
+  },
+  {
+    "command": "budget",
+    "input": {
+      "event_id": "g1-settle",
+      "op": "restart-settle",
+      "id": "r1",
+      "old_uid": "uid-1",
+      "new_uid": "uid-2",
+      "receipt": "g1-runtime-uid2"
+    }
+  }
+]

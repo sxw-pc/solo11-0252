@@ -29,8 +29,11 @@ def handle(db,x):
         return handoff.prepare(db, x)
     if op=='session-adopt':
         return handoff.adopt(db, x, acknowledge)
+    if op=='gateway-offline':
+        return handoff.report_offline(db, x)
     if op=='session-ack':
-        if one(db, 'SELECT 1 FROM handoff_manifests WHERE case_id=?', (x['case'],)):
+        if one(db, 'SELECT 1 FROM handoff_manifests WHERE case_id=?', (x['case'],)) or \
+                one(db, 'SELECT 1 FROM handoff_guarantee_manifests WHERE case_id=?', (x['case'],)):
             return {'decision':'handoff_receipt_required'}
         return acknowledge(db, x)
     if op=='traffic-restore':

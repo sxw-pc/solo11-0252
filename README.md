@@ -59,3 +59,13 @@ python -m unittest discover -s tests -v
 撤流单有尚未关闭的会话时，可用 traffic 的 handoff-manifest 安排整单接收端。输入包含 case、原容器 uid、按名称索引的 gateways（各有 uid 与 capacity）和按会话索引的 assignments（各有 gateway 与 units）。接单后不可用口头 session-ack 清除待办。使用 session-adopt 录入同一 case、uid、session、manifest（安排事件编号）、gateway、gateway_uid 与 receipt。最后一个有效接单回执到达后撤流单为 drained，可经原 restart-settle 结算。没有接单安排的撤流单仍能用 session-ack 关闭会话。该入口按接收端正常联机的容量核对排布。
 
 示例：`python -B -m probecourt traffic --db handoff.sqlite --fixture fixtures/handoff_normal.json`，再用 `python -B -m probecourt replay --db handoff.sqlite` 复核。
+
+### 故障承诺交接（主备双网关）
+
+撤流单最多八个不可拆会话、四个网关。handoff-manifest 改带 `sessions`（各会话固定整数容量）、`eligible`（每个会话经签认的可用接收端列表）即进入故障承诺路径；可附 `plan` 指定每个会话的主、备网关（必须不同且都在签认端内），不附则由确定性回溯求解器择定一份。签单同时核算五种场景：全部在线以及任意单个网关掉线。掉线时只允许该网关承担的主会话转去各自固定备网关，幸存主网关上的会话不得搬动；每种场景下每个网关的合计负载都不得超出签认容量。
+
+拒签给出可重算的逐场景排布证据，并区分两类原因：`handoff_scenario_infeasible` 表示某种掉线本身无可行排布（证据含未排下会话），`handoff_guarantee_unsatisfiable` 表示各掉线分别可排但没有任何主备方案能共同承诺；显式 plan 违反某场景则为 `handoff_plan_violates_guarantee`，并附违反场景与逐场景证据。
+
+签单后用 gateway-offline 报告掉线：已掉线端的旧接单不能再清掉该会话（先前在该主端录入的回执作废、会话回到 pending），备端激活后凭当前实际归属的网关与 UID 重新 session-adopt；幸存主端的会话不得搬动，重送已失联端原件或引用他单归属均返回 `handoff_receipt_mismatch`。全部当前实际目标的回执齐全后撤流单才为 drained，再经 restart-settle 结算。不带故障承诺的旧命令与已结算旧单保持原重放语义。
+
+示例：`python -B -m probecourt traffic --fixture fixtures/handoff_guarantee_bcd.json`（A 掉线后实际归属 BCD）与 `... --fixture fixtures/handoff_guarantee_bcb.json`（实际归属 BCB）；`fixtures/handoff_guarantee_rejected.json` 是容量为 2 时在线与四份离线预案各自可排、却无法共同承诺的拒签原件。
